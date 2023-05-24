@@ -1,80 +1,26 @@
 package ru.kata.spring.boot_security.demo.controller;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import ru.kata.spring.boot_security.demo.entity.User;
-import ru.kata.spring.boot_security.demo.security.UserDetailsImpl;
-import ru.kata.spring.boot_security.demo.service.UserService;
-
-import java.security.Principal;
+import org.springframework.web.bind.annotation.GetMapping;
+import ru.kata.spring.boot_security.demo.model.User;
+import ru.kata.spring.boot_security.demo.service.RoleService;
 
 @Controller
-@RequestMapping("/users")
 public class UserController {
 
-    private final UserService userService;
+    private final RoleService roleService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
-
+    public UserController(RoleService roleService) {
+        this.roleService = roleService;
     }
 
-    @GetMapping()
-    public String getAllUsers(Model model) {
-        model.addAttribute("users", userService.getAllUsers());
-        return "index";
-
+    @GetMapping("/user")
+    public String showUser(Model model, @AuthenticationPrincipal User user) {
+        model.addAttribute("user", user);
+        model.addAttribute("allRoles", roleService.findAll());
+        return "user";
     }
-
-    @GetMapping("/new")
-    public String getViewForCreateUsers(@ModelAttribute("user") User user, Model model) {
-        model.addAttribute("roles", userService.getUserRoles());
-        return "new";
-
-    }
-
-    @PostMapping()
-    public String createUser(@ModelAttribute("user") User user) {
-        userService.saveUser(user);
-        return "redirect:/admin";
-
-    }
-
-    @GetMapping("/id")
-    public String userInfo(@RequestParam("id") int id, Model model, Principal principal) {
-        model.addAttribute("user", userService.userInfo(id));
-        User user = userService.findUserByUsername(principal.getName());
-        if (user.getRoles().toString().contains("ROLE_ADMIN")) {
-            return "adminInfo";
-        }
-        return "userInfo";
-
-    }
-
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @GetMapping("/edit")
-    public String getViewForEditUser(Model model, @RequestParam("edit") int id) {
-        model.addAttribute("user", userService.userInfo(id));
-        return "edit";
-
-    }
-
-    @PatchMapping("/edit")
-    public String updateUser(@ModelAttribute("user") User user) {
-        userService.updateUser(user);
-        return "redirect:/admin";
-
-    }
-
-    @DeleteMapping("/delete")
-    public String deleteUser(@RequestParam("delete") int id) {
-        userService.deleteUser(id);
-        return "redirect:/admin";
-
-    }
-
 }
