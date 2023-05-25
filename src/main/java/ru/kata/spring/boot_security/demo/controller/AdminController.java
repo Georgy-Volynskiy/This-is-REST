@@ -1,6 +1,7 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,33 +27,18 @@ public class AdminController {
     }
 
     @GetMapping
-    public String toUsers(){
-        return "admin";
-    }
-
-    @GetMapping("/users")
-    public String findAll(Model model) {
+    public String findAll(Model model, @AuthenticationPrincipal User user) {
+        model.addAttribute("user", user);
         model.addAttribute("users", userService.findAll());
         model.addAttribute("allRoles", roleService.findAll());
-        return "users";
-    }
-
-    @GetMapping("/users/{id}")
-    public String findById(Model model, @PathVariable Long id) {
-        model.addAttribute("allRoles", roleService.findAll());
-        return userService.findById(id)
-                .map(user -> {
-                    model.addAttribute("user", user);
-                    return "user";
-                })
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return "admin";
     }
 
     @PostMapping("/users")
     public String add(User user, String rawPassword) {
         user.setPassword(passwordEncoder.encode(rawPassword));
         userService.add(user);
-        return "redirect:/admin/users";
+        return "redirect:/admin";
     }
 
     @DeleteMapping("/users/{id}")
@@ -60,7 +46,7 @@ public class AdminController {
         if (!userService.removeById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        return "redirect:/admin/users";
+        return "redirect:/admin";
     }
 
     @PutMapping("/users/{id}")
@@ -71,6 +57,7 @@ public class AdminController {
         if (!userService.update(user)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        return "redirect:/admin/users";
+        return "redirect:/admin";
     }
+
 }

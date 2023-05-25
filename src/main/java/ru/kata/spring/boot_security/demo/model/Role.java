@@ -63,5 +63,4 @@ public class Role implements GrantedAuthority {
     public void setValue(String value) {
         this.value = value;
     }
-
 }

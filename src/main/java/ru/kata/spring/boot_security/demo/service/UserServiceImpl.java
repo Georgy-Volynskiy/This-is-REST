@@ -29,11 +29,13 @@ public class UserServiceImpl implements UserService {
     public boolean update(User user) {
         return userRepository.findById(user.getId())
                 .map(entity -> {
-                    entity.setUserName(user.getUserName());
+                    entity.setEmail(user.getEmail());
                     entity.setFirstName(user.getFirstName());
                     entity.setLastName(user.getLastName());
-                    entity.setBirthDate(user.getBirthDate());
-                    entity.setPassword(user.getPassword());
+                    entity.setAge(user.getAge());
+                    if (user.getPassword() != null) {
+                        entity.setPassword(user.getPassword());
+                    }
                     entity.setRoles(user.getRoles());
                     return true;
                 })
