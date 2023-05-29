@@ -1,29 +1,51 @@
-<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-    <title>Login</title>
-</head>
-<body class="bg-light">
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<div class="container-fluid">
-    <div class="row py-5">
-        <div class="col-3 mx-auto">
-            <h1>Please sign in</h1>
-            <form action="/login" method="post">
-                <input type="email" class="form-control form-control-lg" name="username" placeholder="Email address"/>
-                <input type="password" class="form-control form-control-lg" name="password" placeholder="Password"/>
-                <div class="d-grid py-3">
-                    <button class="btn btn-primary btn-lg" type="submit">Sign in</button>
-                </div>
-            </form>
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <title>Login page</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+        integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+
+</head>
+
+<body>
+<div class="container-fluid mt-5">
+  <div class="row">
+    <div class="col-4 offset-4">
+      <div class="row">
+        <div class="col-md-8 offset-2">
+          <p class="h3 font-weight-bold">Please sign in</p>
+
+          <form method="POST" action="/login">
+            <div class="form-group">
+
+              <label class="sr-only" for="username">Email</label>
+              <input class="form-control" type="text" placeholder="Email address"
+                     name="username" id="username">
+              <label class="sr-only" for="password">Username</label>
+              <input class="form-control" type="password"  placeholder="Password"
+                     name="password" id="password">
+              <button type="submit" class="btn btn-primary btn-md btn-block mt-2">Sign in</button>
+            </div>
+          </form>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+        crossorigin="anonymous"></script>
 </body>
+
 </html>

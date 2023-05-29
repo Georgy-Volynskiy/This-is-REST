@@ -1,40 +1,36 @@
 package ru.kata.spring.boot_security.demo.initialization;
 
-import org.springframework.stereotype.Component;
-import ru.kata.spring.boot_security.demo.dto.UserCreateUpdateDto;
-import ru.kata.spring.boot_security.demo.model.Role;
-import ru.kata.spring.boot_security.demo.service.RoleService;
-import ru.kata.spring.boot_security.demo.service.UserService;
+import org.springframework.stereotype.Service;
+import ru.kata.spring.boot_security.demo.entities.Role;
+import ru.kata.spring.boot_security.demo.entities.User;
+import ru.kata.spring.boot_security.demo.services.RoleService;
+import ru.kata.spring.boot_security.demo.services.UserService;
 
 import javax.annotation.PostConstruct;
 import java.util.Set;
 
-@Component
+@Service
 public class InitDB {
-
-    private final RoleService roleService;
     private final UserService userService;
+    private final RoleService roleService;
 
-    public InitDB(RoleService roleService, UserService userService) {
-        this.roleService = roleService;
+    public InitDB(UserService userService, RoleService roleService) {
         this.userService = userService;
+        this.roleService = roleService;
     }
 
     @PostConstruct
-    private void fillDb() {
-        Role roleAdmin = roleService.add(new Role("ROLE_ADMIN"));
-        Role roleUser = roleService.add(new Role("ROLE_USER"));
+    public void fillTable() {
+        Role role1 = new Role(1l,"ADMIN");
+        Role role2 = new Role( 2l,"USER");
+        roleService.save(role1);
+        roleService.save(role2);
 
-        UserCreateUpdateDto admin =
-                new UserCreateUpdateDto("admin@mail.ru", "Ivan", "Petrov", 18, "root", Set.of(roleAdmin));
-        userService.add(admin);
+        User user1 = new User("Борис", "Бритва", 28, "admin@mail.ru","root", Set.of(role1));
+        userService.save(user1);
 
-        UserCreateUpdateDto user =
-                new UserCreateUpdateDto("user@mail.ru", "Boris", "Britva", 32, "root", Set.of(roleUser));
-        userService.add(user);
+        User user2 = new User("Георгий", "Волынский", 29, "user@mail.ru", "root", Set.of(role2));
+        userService.save(user2);
 
-        UserCreateUpdateDto userAdmin =
-                new UserCreateUpdateDto("moderator@mail.ru", "Oleg", "Ivanov", 64, "root", Set.of(roleAdmin, roleUser));
-        userService.add(userAdmin);
     }
 }
