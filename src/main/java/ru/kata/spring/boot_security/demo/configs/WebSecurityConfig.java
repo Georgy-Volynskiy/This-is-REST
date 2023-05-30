@@ -8,53 +8,56 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ru.kata.spring.boot_security.demo.services.UserService;
+import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.web.filter.CharacterEncodingFilter;
+import ru.kata.spring.boot_security.demo.service.UserService;
+
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
     private final SuccessUserHandler successUserHandler;
+    private final PasswordEncoder encoder;
     private final UserService userService;
 
     @Autowired
-    public WebSecurityConfig(SuccessUserHandler successUserHandler, UserService userService) {
+    public WebSecurityConfig(SuccessUserHandler successUserHandler,
+                             PasswordEncoder encoder,
+                             UserService userService) {
         this.successUserHandler = successUserHandler;
+        this.encoder = encoder;
         this.userService = userService;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                .authorizeRequests()
-                .antMatchers("/", "/user").hasAnyAuthority("ADMIN", "USER")
-                .antMatchers("/api/admin/**", "/admin/**").hasAuthority("ADMIN")
-                .and().httpBasic()
-                .and()
-                .formLogin()
-                .loginPage("/login")
-                .permitAll()
-                .successHandler(new SuccessUserHandler())
-                .and()
-                .logout().logoutSuccessUrl("/login")
-                .and()
-                .csrf().disable();
-    }
-
-    @Bean
-    public static PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        http.csrf().disable();
+        CharacterEncodingFilter filter = new CharacterEncodingFilter();
+        filter.setEncoding("UTF-8");
+        filter.setForceEncoding(true);
+        http.addFilterBefore(filter, CsrfFilter.class);
+        http.authorizeRequests()
+                .antMatchers("/*").permitAll()
+                .antMatchers("/user").access("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+                .antMatchers("/api/users/**").access("hasAnyRole('ROLE_ADMIN')")
+                .and().formLogin()
+                .successHandler(successUserHandler);
     }
 
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
-
-        authenticationProvider.setUserDetailsService(userService);
-        return authenticationProvider;
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setPasswordEncoder(encoder);
+        provider.setUserDetailsService(userDetailsService());
+        return provider;
+    }
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return userService::loadUserByUsername;
     }
 
 }
